@@ -1,0 +1,28 @@
+{
+  "name": "hay",
+  "version": "0.1.0",
+  "description": "Protect your hay! Or eat their hay!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandcastleco/hay.git"
+  },
+  "keywords": [
+    "game",
+    "chess",
+    "hay"
+  ],
+  "author": "Sandcastle Games",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sandcastleco/hay/issues"
+  },
+  "homepage": "http://sandcastle.co/hay",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-connect": "^0.11.2",
+    "grunt-contrib-watch": "^0.6.1"
+  },
+  "dependencies": {
+    "phaser": "^2.4.3"
+  }
+}
