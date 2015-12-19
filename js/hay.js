@@ -2,132 +2,128 @@ var canvas = document.getElementById("hay");
 var ctx = canvas.getContext("2d");
 
 var tiles = [];
-var tileWidth = canvas.width/8;
-var tileHeight = canvas.height/8;
 var tileColumnCount = 8;
 var tileRowCount = 8;
+var tileWidth = canvas.width / tileColumnCount;
+var tileHeight = canvas.height / tileRowCount;
+var pieces = [];
+var pieceDescriptions = {
+  far: {
+    name: "farmer",
+    color: "green"
+  },
+  hor: {
+    name: "horse",
+    color: "tan"
+  },
+  pig: {
+    name: "pig",
+    color: "pink"
+  },
+  cow: {
+    name: "cow",
+    color: "black"
+  },
+  chi: {
+    name: "chicken",
+    color: "white"
+  },
+  hay: {
+    name: "hay",
+    color: "yellow"
+  }
+};
+var pieceWidth = tileWidth / 3;
+var board = [
+  ["cow", "chi", "pig", "hor", "far", "pig", "chi", "cow"],
+  ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"]
+]
+
+/*
+ * Tile prototype
+ */
+
+function Tile(x, y, width, height, fill) {
+  this.x = x * tileWidth;
+  this.y = y * tileHeight;
+  this.fill = fill || "#E7E7E7";
+  this.width = width || tileWidth;
+  this.height = height || tileHeight;
+}
+Tile.prototype.draw = function() {
+  ctx.beginPath();
+  ctx.rect(this.x, this.y, this.width, this.height);
+  ctx.fillStyle = this.fill;
+  ctx.fill();
+  ctx.closePath();
+}
+Tile.prototype.isPointInside = function(x, y) {
+  return (x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height)
+}
+
+/*
+ * Piece prototype
+ */
+
+function Piece(id, tileX, tileY, fill, stroke, width, height) {
+  this.id = id;
+  this.tile = tiles[tileX][tileY];
+  this.x = this.tile.x + this.tile.width / 2;
+  this.y = this.tile.y + this.tile.height / 2;
+  this.fill = fill || "#000";
+  this.stroke = stroke || "#7E7E7E";
+  this.width = width || pieceWidth;
+  this.height = height || pieceWidth;
+}
+Piece.prototype.draw = function() {
+  console.log(this.fill);
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.width, 0, Math.PI*2);
+  ctx.fillStyle = this.fill;
+  ctx.strokeStyle = this.stroke;
+  ctx.fill();
+  ctx.stroke();
+  ctx.closePath();
+}
+Piece.prototype.isPointInside = function(x, y) {
+  return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height)
+}
+
 for (c = 0; c < tileColumnCount; c++) {
   tiles[c] = [];
   for (r = 0; r < tileRowCount; r++) {
-    tiles[c][r] = {x: 0, y: 0, type: 0};
+    tiles[c][r] = new Tile(c, r);
   }
 }
 
-var pieceWidth = tileWidth / 3;
-
-var pieces = [
-  farmer = {
-    initialX: 4,
-    initialY: 7,
-    color: "green"
-  },
-  horse = {
-    initialX: 3,
-    initialY: 7,
-    color: "tan"
-  },
-  pig1 = {
-    initialX: 2,
-    initialY: 7,
-    color: "pink"
-  },
-  pig2 = {
-    initialX: 5,
-    initialY: 7,
-    color: "pink"
-  },
-  chicken1 = {
-    initialX: 1,
-    initialY: 7,
-    color: "white"
-  },
-  chicken2 = {
-    initialX: 6,
-    initialY: 7,
-    color: "white"
-  },
-  cow1 = {
-    initialX: 0,
-    initialY: 7,
-    color: "black"
-  },
-  cow2 = {
-    initialX: 7,
-    initialY: 7,
-    color: "black"
-  },
-  hay1 = {
-    initialX: 0,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay2 = {
-    initialX: 1,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay3 = {
-    initialX: 2,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay4 = {
-    initialX: 3,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay5 = {
-    initialX: 4,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay6 = {
-    initialX: 5,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay7 = {
-    initialX: 6,
-    initialY: 6,
-    color: "yellow"
-  },
-  hay8 = {
-    initialX: 7,
-    initialY: 6,
-    color: "yellow"
+for (r = 0; r < board.length; r++) {
+  pieces[r] = [];
+  for (c = 0; c < tileColumnCount; c++) {
+    var currentPiece = board[r][c];
+    var piece = pieceDescriptions[currentPiece];
+    pieces[r][c] = new Piece(piece.name, c, r, piece.color);
   }
-];
+}
 
 function drawPieces() {
-  for (i = 0; i < pieces.length; i++) {
-    var piece = pieces[i];
-    var pieceX = piece.initialX * tileWidth + tileWidth/2;
-    var pieceY = piece.initialY * tileHeight + tileHeight/2;
-    ctx.beginPath();
-    ctx.arc(pieceX, pieceY, pieceWidth, 0, Math.PI*2);
-    ctx.fillStyle = piece.color;
-    ctx.strokeStyle = "#7e7e7e";
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
+  for (r = 0; r < board.length; r++) {
+    for (c = 0; c < tileColumnCount; c++) {
+      var piece = pieces[r][c];
+      piece.draw();
+    }
   }
 }
 
 function drawTiles() {
   for(c=0; c < tileColumnCount; c++) {
     for (r = 0; r < tileRowCount; r++) {
-      var tileX = c * tileWidth;
-      var tileY = r * tileHeight;
-      tiles[c][r].x = tileX;
-      tiles[c][r].y = tileY;
-      ctx.beginPath();
-      ctx.rect(tileX, tileY, tileWidth, tileHeight);
+      var tile = tiles[c][r];
       if (c%2 == r%2) {
-        ctx.fillStyle = "#E7E7E7";
+        tile.fill = "#E7E7E7";
       } else {
-        ctx.fillStyle = "#FFF";
+        tile.fill = "#FFF";
       }
-      ctx.fill();
+      tile.draw();
     }
   }
 }
@@ -135,6 +131,21 @@ function drawTiles() {
 function draw() {
   drawTiles();
   drawPieces();
+}
+
+canvas.addEventListener("click", clickHandler, false);
+
+function clickHandler(e) {
+  mouseX = parseInt(e.clientX - canvas.offsetLeft);
+  mouseY = parseInt(e.clientY - canvas.offsetTop);
+  for (r = 0; r < pieces.length; r++) {
+    for (c = 0; c < tileColumnCount; c++) {
+      var piece = pieces[r][c];
+      if (piece.isPointInside(mouseX, mouseY)) {
+        alert("You clicked on " + piece.id + "!");
+      }
+    }
+  }
 }
 
 draw();
