@@ -6,6 +6,7 @@ var tileColumnCount = 8;
 var tileRowCount = 8;
 var tileWidth = canvas.width / tileColumnCount;
 var tileHeight = canvas.height / tileRowCount;
+var selectedPiece = null;
 var pieces = [];
 var pieceDescriptions = {
   far: {
@@ -74,9 +75,9 @@ function Piece(id, tileX, tileY, fill, stroke, width, height) {
   this.stroke = stroke || "#7E7E7E";
   this.width = width || pieceWidth;
   this.height = height || pieceWidth;
+  this.selected = false;
 }
 Piece.prototype.draw = function() {
-  console.log(this.fill);
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.width, 0, Math.PI*2);
   ctx.fillStyle = this.fill;
@@ -84,6 +85,14 @@ Piece.prototype.draw = function() {
   ctx.fill();
   ctx.stroke();
   ctx.closePath();
+}
+Piece.prototype.move = function(tile) {
+  console.log(this.tile);
+  this.tile = tile;
+  console.log(this.tile);
+  this.x = this.tile.x + this.tile.width / 2;
+  this.y = this.tile.y + this.tile.height / 2;
+  this.draw();
 }
 Piece.prototype.isPointInside = function(x, y) {
   return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height)
@@ -138,14 +147,28 @@ canvas.addEventListener("click", clickHandler, false);
 function clickHandler(e) {
   mouseX = parseInt(e.clientX - canvas.offsetLeft);
   mouseY = parseInt(e.clientY - canvas.offsetTop);
-  for (r = 0; r < pieces.length; r++) {
-    for (c = 0; c < tileColumnCount; c++) {
-      var piece = pieces[r][c];
-      if (piece.isPointInside(mouseX, mouseY)) {
-        alert("You clicked on " + piece.id + "!");
+  for (c = 0; c < tileColumnCount; c++) {
+    for (r = 0; r < tileRowCount; r++) {
+      var tile = tiles[c][r];
+      if (tile.isPointInside(mouseX, mouseY)) {
+        if (selectedPiece) {
+          selectedPiece.move(tile);
+          selectedPiece = null;
+        } else {
+          for (i = 0; i < pieces.length; i++) {
+            for (j = 0; j < tileColumnCount; j++) {
+              var piece = pieces[i][j];
+              if (piece.isPointInside(mouseX, mouseY)) {
+                console.log("You clicked on " + piece.id + "!");
+                selectedPiece = piece;
+              }
+            }
+          }
+        }
       }
     }
   }
+  draw();
 }
 
 draw();
