@@ -6,8 +6,10 @@ var tileColumnCount = 8;
 var tileRowCount = 8;
 var tileWidth = canvas.width / tileColumnCount;
 var tileHeight = canvas.height / tileRowCount;
-var selectedPiece = null;
+
 var pieces = [];
+var selectedPiece = null;
+var pieceWidth = tileWidth / 3;
 var pieceDescriptions = {
   far: {
     name: "farmer",
@@ -34,7 +36,6 @@ var pieceDescriptions = {
     color: "yellow"
   }
 };
-var pieceWidth = tileWidth / 3;
 var board = [
   ["cow", "chi", "pig", "hor", "far", "pig", "chi", "cow"],
   ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"],
@@ -105,6 +106,7 @@ Piece.prototype.isPointInside = function(x, y) {
   return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height)
 }
 
+// Create tile objects
 for (c = 0; c < tileColumnCount; c++) {
   tiles[c] = [];
   for (r = 0; r < tileRowCount; r++) {
@@ -112,6 +114,7 @@ for (c = 0; c < tileColumnCount; c++) {
   }
 }
 
+// Create piece objects
 for (r = 0; r < board.length; r++) {
   pieces[r] = [];
   for (c = 0; c < tileColumnCount; c++) {
@@ -172,7 +175,6 @@ function clickHandler(e) {
             for (j = 0; j < tileColumnCount; j++) {
               var piece = pieces[i][j];
               if (piece != undefined && piece.isPointInside(mouseX, mouseY)) {
-                console.log("You clicked on " + piece.id + "!");
                 selectedPiece = piece;
               }
             }
