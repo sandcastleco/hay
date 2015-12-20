@@ -37,7 +37,13 @@ var pieceDescriptions = {
 var pieceWidth = tileWidth / 3;
 var board = [
   ["cow", "chi", "pig", "hor", "far", "pig", "chi", "cow"],
-  ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"]
+  ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"],
+  [],
+  [],
+  [],
+  [],
+  ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"],
+  ["cow", "chi", "pig", "hor", "far", "pig", "chi", "cow"]
 ]
 
 /*
@@ -50,6 +56,7 @@ function Tile(x, y, width, height, fill) {
   this.fill = fill || "#E7E7E7";
   this.width = width || tileWidth;
   this.height = height || tileHeight;
+  this.occupied = false;
 }
 Tile.prototype.draw = function() {
   ctx.beginPath();
@@ -78,6 +85,7 @@ function Piece(id, tileX, tileY, fill, stroke, width, height) {
   this.selected = false;
 }
 Piece.prototype.draw = function() {
+  this.tile.occupied = true;
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.width, 0, Math.PI*2);
   ctx.fillStyle = this.fill;
@@ -87,9 +95,8 @@ Piece.prototype.draw = function() {
   ctx.closePath();
 }
 Piece.prototype.move = function(tile) {
-  console.log(this.tile);
+  this.tile.occupied = false;
   this.tile = tile;
-  console.log(this.tile);
   this.x = this.tile.x + this.tile.width / 2;
   this.y = this.tile.y + this.tile.height / 2;
   this.draw();
@@ -109,8 +116,12 @@ for (r = 0; r < board.length; r++) {
   pieces[r] = [];
   for (c = 0; c < tileColumnCount; c++) {
     var currentPiece = board[r][c];
-    var piece = pieceDescriptions[currentPiece];
-    pieces[r][c] = new Piece(piece.name, c, r, piece.color);
+    if (currentPiece == undefined) {
+      pieces[r][c] = null;
+    } else {
+      var piece = pieceDescriptions[currentPiece];
+      pieces[r][c] = new Piece(piece.name, c, r, piece.color);
+    }
   }
 }
 
@@ -118,7 +129,9 @@ function drawPieces() {
   for (r = 0; r < board.length; r++) {
     for (c = 0; c < tileColumnCount; c++) {
       var piece = pieces[r][c];
-      piece.draw();
+      if (piece != null) {
+        piece.draw();
+      }
     }
   }
 }
@@ -151,14 +164,14 @@ function clickHandler(e) {
     for (r = 0; r < tileRowCount; r++) {
       var tile = tiles[c][r];
       if (tile.isPointInside(mouseX, mouseY)) {
-        if (selectedPiece) {
+        if (selectedPiece && tile.occupied == false) {
           selectedPiece.move(tile);
           selectedPiece = null;
         } else {
           for (i = 0; i < pieces.length; i++) {
             for (j = 0; j < tileColumnCount; j++) {
               var piece = pieces[i][j];
-              if (piece.isPointInside(mouseX, mouseY)) {
+              if (piece != undefined && piece.isPointInside(mouseX, mouseY)) {
                 console.log("You clicked on " + piece.id + "!");
                 selectedPiece = piece;
               }
