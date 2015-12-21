@@ -76,8 +76,8 @@ Tile.prototype.draw = function() {
   ctx.fill();
   ctx.closePath();
 }
-Tile.prototype.isPointInside = function(x, y) {
-  return (x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height);
+Tile.prototype.isPointInside = function(coordinates) {
+  return (coordinates.x >= this.x && coordinates.x <= this.x + this.width && coordinates.y >= this.y && coordinates.y <= this.y + this.height);
 }
 
 /*
@@ -118,12 +118,10 @@ Piece.prototype.move = function(tile) {
   this.selected = false;
   for (var i = 0; i < this.validMoves.length; i++) {
     this.validMoves[i].valid = false;
-    this.validMoves[i].draw();
   }
-  this.draw();
 }
-Piece.prototype.isPointInside = function(x, y) {
-  return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height);
+Piece.prototype.isPointInside = function(coordinates) {
+  return (coordinates.x >= this.tile.x && coordinates.x <= this.tile.x + this.tile.width && coordinates.y >= this.tile.y && coordinates.y <= this.tile.y + this.tile.height);
 }
 Piece.prototype.findValidMoves = function() {
   var column = this.tile.column;
@@ -135,7 +133,6 @@ Piece.prototype.findValidMoves = function() {
         var tile = tiles[c][r];
         if (tile.column == moveGrid[i][0] && tile.row == moveGrid[i][1] && tile.occupied == false) {
           tile.valid = true;
-          tile.draw();
           this.validMoves.push(tile);
         }
       }
@@ -153,28 +150,18 @@ for (c = 0; c < tileColumnCount; c++) {
 
 // Create piece objects
 for (r = 0; r < board.length; r++) {
-  pieces[r] = [];
   for (c = 0; c < tileColumnCount; c++) {
     var currentPiece = board[r][c];
-    if (currentPiece == undefined) {
-      pieces[r][c] = null;
-    } else {
+    if (currentPiece != undefined) {
       var piece = pieceDescriptions[currentPiece];
-      pieces[r][c] = new Piece(piece.name, c, r, piece.color);
+      pieces.push(new Piece(piece.name, c, r, piece.color));
     }
   }
 }
 
-function drawPieces() {
-  for (r = 0; r < board.length; r++) {
-    for (c = 0; c < tileColumnCount; c++) {
-      var piece = pieces[r][c];
-      if (piece != null) {
-        piece.draw();
-      }
-    }
-  }
-}
+/*
+ * Present
+ */
 
 function drawTiles() {
   for(c=0; c < tileColumnCount; c++) {
@@ -190,46 +177,88 @@ function drawTiles() {
   }
 }
 
+function drawPieces() {
+  for (var i = 0; i < pieces.length; i++) {
+    pieces[i].draw();
+  }
+}
+
 function draw() {
   drawTiles();
   drawPieces();
 }
 
+/*
+ * Accept
+ */
+
 canvas.addEventListener("click", clickHandler, false);
 
-function clickHandler(e) {
-  mouseX = parseInt(e.clientX - canvas.offsetLeft);
-  mouseY = parseInt(e.clientY - canvas.offsetTop);
-  for (c = 0; c < tileColumnCount; c++) {
-    for (r = 0; r < tileRowCount; r++) {
+/*
+ * Interpret & Calculate
+ */
+
+function findClickCoordinates(event) {
+  var mouseX = parseInt(event.clientX - canvas.offsetLeft);
+  var mouseY = parseInt(event.clientY - canvas.offsetTop);
+  return {x: mouseX, y: mouseY};
+}
+
+function findClickedTile(coordinates) {
+  for (var c = 0; c < tileColumnCount; c++) {
+    for (var r = 0; r < tileColumnCount; r++) {
       var tile = tiles[c][r];
-      if (tile.isPointInside(mouseX, mouseY)) {
-        if (selectedPiece && tile.valid) {
-          selectedPiece.move(tile);
-          selectedPiece = null;
-        } else {
-          for (i = 0; i < pieces.length; i++) {
-            for (j = 0; j < tileColumnCount; j++) {
-              var piece = pieces[i][j];
-              if (piece != undefined && piece.isPointInside(mouseX, mouseY)) {
-                if (selectedPiece) {
-                  selectedPiece.selected = false;
-                  for (var i = 0; i < selectedPiece.validMoves.length; i++) {
-                    selectedPiece.validMoves[i].valid = false;
-                    selectedPiece.validMoves[i].draw();
-                  }
-                }
-                piece.findValidMoves();
-                selectedPiece = piece;
-                selectedPiece.selected = true;
-                selectedPiece.draw();
-              }
-            }
-          }
-        }
+      if (tile.isPointInside(coordinates)) {
+        return tile;
       }
     }
   }
+}
+
+function findClickedPiece(coordinates) {
+  for(var i = 0; i < pieces.length; i++) {
+    var piece = pieces[i];
+    if (piece.isPointInside(coordinates)) {
+      return piece;
+    }
+  }
+}
+
+function selectPiece(piece) {
+  selectedPiece = piece;
+  selectedPiece.selected = true;
+  selectedPiece.findValidMoves();
+}
+
+function clearSelection() {
+  selectedPiece.selected = false;
+  clearValidMoves(selectedPiece);
+  selectedPiece = null;
+}
+
+function clearValidMoves(piece) {
+  for (var i = 0; i < piece.validMoves.length; i++) {
+    piece.validMoves[i].valid = false;
+  }
+}
+
+function clickHandler(e) {
+  var mouseCoordinates = findClickCoordinates(e);
+
+  var tile = findClickedTile(mouseCoordinates);
+  var piece = findClickedPiece(mouseCoordinates);
+
+  if (selectedPiece && tile.valid) {
+    selectedPiece.move(tile);
+  }
+
+  if (piece) {
+    if (selectedPiece) {
+      clearSelection();
+    }
+    selectPiece(piece);
+  }
+
   draw();
 }
 
