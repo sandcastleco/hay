@@ -52,12 +52,16 @@ var board = [
  */
 
 function Tile(x, y, width, height, fill) {
+  this.column = x;
+  this.row = y;
+  this.coordinates = [this.column, this.row];
   this.x = x * tileWidth;
   this.y = y * tileHeight;
   this.fill = fill || "#E7E7E7";
   this.width = width || tileWidth;
   this.height = height || tileHeight;
   this.occupied = false;
+  this.valid = false;
 }
 Tile.prototype.draw = function() {
   ctx.beginPath();
@@ -67,7 +71,7 @@ Tile.prototype.draw = function() {
   ctx.closePath();
 }
 Tile.prototype.isPointInside = function(x, y) {
-  return (x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height)
+  return (x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height);
 }
 
 /*
@@ -103,7 +107,28 @@ Piece.prototype.move = function(tile) {
   this.draw();
 }
 Piece.prototype.isPointInside = function(x, y) {
-  return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height)
+  return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height);
+}
+Piece.prototype.findValidMoves = function() {
+  var validMoves = [];
+  var column = this.tile.column;
+  var row = this.tile.row;
+  var moveGrid = [[column, row - 1], [column + 1, row - 1], [column + 1, row], [column + 1, row + 1], [column, row + 1], [column - 1, row + 1], [column - 1, row], [column - 1, row - 1]];
+  for (var i = 0; i < moveGrid.length; i++) {
+    for (var c = 0; c < tileColumnCount; c++) {
+      for (r = 0; r < tileRowCount; r++) {
+        var tile = tiles[c][r];
+        if (tile.column == moveGrid[i][0] && tile.row == moveGrid[i][1] && tile.occupied == false) {
+          tile.valid = true;
+          validMoves.push(tile);
+        }
+      }
+    }
+  }
+
+  console.log(this.tile.column);
+  console.log(this.tile.row);
+  console.log(validMoves);
 }
 
 // Create tile objects
@@ -167,7 +192,7 @@ function clickHandler(e) {
     for (r = 0; r < tileRowCount; r++) {
       var tile = tiles[c][r];
       if (tile.isPointInside(mouseX, mouseY)) {
-        if (selectedPiece && tile.occupied == false) {
+        if (selectedPiece && tile.valid) {
           selectedPiece.move(tile);
           selectedPiece = null;
         } else {
@@ -175,6 +200,7 @@ function clickHandler(e) {
             for (j = 0; j < tileColumnCount; j++) {
               var piece = pieces[i][j];
               if (piece != undefined && piece.isPointInside(mouseX, mouseY)) {
+                piece.findValidMoves();
                 selectedPiece = piece;
               }
             }
