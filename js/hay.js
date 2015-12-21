@@ -212,6 +212,13 @@ function clickHandler(e) {
             for (j = 0; j < tileColumnCount; j++) {
               var piece = pieces[i][j];
               if (piece != undefined && piece.isPointInside(mouseX, mouseY)) {
+                if (selectedPiece) {
+                  selectedPiece.selected = false;
+                  for (var i = 0; i < selectedPiece.validMoves.length; i++) {
+                    selectedPiece.validMoves[i].valid = false;
+                    selectedPiece.validMoves[i].draw();
+                  }
+                }
                 piece.findValidMoves();
                 selectedPiece = piece;
                 selectedPiece.selected = true;
