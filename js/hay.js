@@ -255,8 +255,9 @@ function clickHandler(e) {
   if (piece) {
     if (selectedPiece) {
       clearSelection();
+    } else {
+      selectPiece(piece);
     }
-    selectPiece(piece);
   }
 
   draw();
