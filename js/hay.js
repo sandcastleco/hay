@@ -66,7 +66,13 @@ function Tile(x, y, width, height, fill) {
 Tile.prototype.draw = function() {
   ctx.beginPath();
   ctx.rect(this.x, this.y, this.width, this.height);
-  ctx.fillStyle = this.fill;
+  if (this.valid) {
+    ctx.fillStyle = "blue";
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = this.fill;
+  }
   ctx.fill();
   ctx.closePath();
 }
@@ -88,12 +94,17 @@ function Piece(id, tileX, tileY, fill, stroke, width, height) {
   this.width = width || pieceWidth;
   this.height = height || pieceWidth;
   this.selected = false;
+  this.validMoves = [];
 }
 Piece.prototype.draw = function() {
   this.tile.occupied = true;
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.width, 0, Math.PI*2);
-  ctx.fillStyle = this.fill;
+  if (this.selected) {
+    ctx.fillStyle = "blue";
+  } else {
+    ctx.fillStyle = this.fill;
+  }
   ctx.strokeStyle = this.stroke;
   ctx.fill();
   ctx.stroke();
@@ -104,13 +115,17 @@ Piece.prototype.move = function(tile) {
   this.tile = tile;
   this.x = this.tile.x + this.tile.width / 2;
   this.y = this.tile.y + this.tile.height / 2;
+  this.selected = false;
+  for (var i = 0; i < this.validMoves.length; i++) {
+    this.validMoves[i].valid = false;
+    this.validMoves[i].draw();
+  }
   this.draw();
 }
 Piece.prototype.isPointInside = function(x, y) {
   return (x >= this.tile.x && x <= this.tile.x + this.tile.width && y >= this.tile.y && y <= this.tile.y + this.tile.height);
 }
 Piece.prototype.findValidMoves = function() {
-  var validMoves = [];
   var column = this.tile.column;
   var row = this.tile.row;
   var moveGrid = [[column, row - 1], [column + 1, row - 1], [column + 1, row], [column + 1, row + 1], [column, row + 1], [column - 1, row + 1], [column - 1, row], [column - 1, row - 1]];
@@ -120,15 +135,12 @@ Piece.prototype.findValidMoves = function() {
         var tile = tiles[c][r];
         if (tile.column == moveGrid[i][0] && tile.row == moveGrid[i][1] && tile.occupied == false) {
           tile.valid = true;
-          validMoves.push(tile);
+          tile.draw();
+          this.validMoves.push(tile);
         }
       }
     }
   }
-
-  console.log(this.tile.column);
-  console.log(this.tile.row);
-  console.log(validMoves);
 }
 
 // Create tile objects
@@ -202,6 +214,8 @@ function clickHandler(e) {
               if (piece != undefined && piece.isPointInside(mouseX, mouseY)) {
                 piece.findValidMoves();
                 selectedPiece = piece;
+                selectedPiece.selected = true;
+                selectedPiece.draw();
               }
             }
           }
