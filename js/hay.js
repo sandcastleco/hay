@@ -2,8 +2,8 @@ var canvas = document.getElementById("hay");
 var ctx = canvas.getContext("2d");
 
 var tiles = [];
-var tileColumnCount = 8;
-var tileRowCount = 8;
+var tileColumnCount = 10;
+var tileRowCount = 10;
 var tileWidth = canvas.width / tileColumnCount;
 var tileHeight = canvas.height / tileRowCount;
 
@@ -37,14 +37,16 @@ var pieceDescriptions = {
   }
 };
 var board = [
-  ["cow", "chi", "pig", "hor", "far", "pig", "chi", "cow"],
-  ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"],
+  ["cow", "chi", "hay", "hay", "hay", "hay", "hay", "hay", "chi", "cow"],
+  ["pig", "cow", "chi", "pig", "hor", "far", "pig", "chi", "cow", "pig"],
   [],
   [],
+  [null, null, null, "hay", "hay", "hay", "hay", null, null, null],
+  [null, null, null, "hay", "hay", "hay", "hay", null, null, null],
   [],
   [],
-  ["hay", "hay", "hay", "hay", "hay", "hay", "hay", "hay"],
-  ["cow", "chi", "pig", "hor", "far", "pig", "chi", "cow"]
+  ["pig", "cow", "chi", "pig", "hor", "far", "pig", "chi", "cow", "pig"],
+  ["cow", "chi", "hay", "hay", "hay", "hay", "hay", "hay", "chi", "cow"]
 ]
 
 /*
@@ -124,17 +126,91 @@ Piece.prototype.isPointInside = function(coordinates) {
   return (coordinates.x >= this.tile.x && coordinates.x <= this.tile.x + this.tile.width && coordinates.y >= this.tile.y && coordinates.y <= this.tile.y + this.tile.height);
 }
 Piece.prototype.findValidMoves = function() {
-  var column = this.tile.column;
-  var row = this.tile.row;
-  var moveGrid = [[column, row - 1], [column + 1, row - 1], [column + 1, row], [column + 1, row + 1], [column, row + 1], [column - 1, row + 1], [column - 1, row], [column - 1, row - 1]];
-  for (var i = 0; i < moveGrid.length; i++) {
-    for (var c = 0; c < tileColumnCount; c++) {
-      for (r = 0; r < tileRowCount; r++) {
-        var tile = tiles[c][r];
-        if (tile.column == moveGrid[i][0] && tile.row == moveGrid[i][1] && tile.occupied == false) {
-          tile.valid = true;
-          this.validMoves.push(tile);
+  if (this.id == "pig" || this.id == "farmer" || this.id == "horse") {
+    var column = this.tile.column;
+    var row = this.tile.row;
+    var moveGrid = [[column, row - 1], [column + 1, row - 1], [column + 1, row], [column + 1, row + 1], [column, row + 1], [column - 1, row + 1], [column - 1, row], [column - 1, row - 1]];
+    for (var i = 0; i < moveGrid.length; i++) {
+      for (var c = 0; c < tileColumnCount; c++) {
+        for (r = 0; r < tileRowCount; r++) {
+          var tile = tiles[c][r];
+          if (tile.column == moveGrid[i][0] && tile.row == moveGrid[i][1] && tile.occupied == false) {
+            tile.valid = true;
+            this.validMoves.push(tile);
+          }
         }
+      }
+    }
+  } else if (this.id == "chicken") {
+    var column = this.tile.column;
+    var row = this.tile.row;
+    var moveGrid = [[column, row - 2], [column + 2, row - 2], [column + 2, row], [column + 2, row + 2], [column, row + 2], [column - 2, row + 2], [column - 2, row], [column - 2, row - 2]];
+    for (var i = 0; i < moveGrid.length; i++) {
+      for (var c = 0; c < tileColumnCount; c++) {
+        for (r = 0; r < tileRowCount; r++) {
+          var tile = tiles[c][r];
+          if (tile.column == moveGrid[i][0] && tile.row == moveGrid[i][1] && tile.occupied == false) {
+            tile.valid = true;
+            this.validMoves.push(tile);
+          }
+        }
+      }
+    }
+  } else if (this.id == "cow") {
+    var column = this.tile.column;
+    var row = this.tile.row;
+    console.log(column, row);
+    for (var r = row-1; r >= 0; r--) {
+      var tile = tiles[column][r];
+      var previousTile = tiles[column][r+1];
+      if (tile.occupied) {
+        if (!previousTile.occupied) {
+          previousTile.valid = true;
+          this.validMoves.push(previousTile);
+        }
+        break;
+      }
+    }
+    for (var r = row+1; r < tileRowCount; r++) {
+      var tile = tiles[column][r];
+      var previousTile = tiles[column][r-1];
+      if (tile.occupied) {
+        if (!previousTile.occupied) {
+          previousTile.valid = true;
+          this.validMoves.push(previousTile);
+        }
+        break;
+      }
+    }
+    for (var c = column-1; c >= 0; c--) {
+      var tile = tiles[c][row];
+      console.log(tile);
+      var previousTile = tiles[c+1][row];
+      if (tile.occupied) {
+        if (!previousTile.occupied) {
+          previousTile.valid = true;
+          this.validMoves.push(previousTile);
+        }
+        break;
+      }
+      if (tile.column == 0) {
+        tile.valid = true;
+        this.validMoves.push(tile);
+      }
+    }
+    for (var c = column+1; c < tileColumnCount; c++) {
+      var tile = tiles[c][row];
+      var previousTile = tiles[c-1][row];
+      if (tile.occupied == true) {
+        if(!previousTile.occupied) {
+          previousTile.valid = true;
+          this.validMoves.push(previousTile);
+        }
+        break;
+      }
+      if (tile.column == tileColumnCount-1) {
+        tile.valid = true;
+        this.validMoves.push(tile);
       }
     }
   }
