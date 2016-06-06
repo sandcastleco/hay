@@ -26,10 +26,14 @@ Grid.prototype = (function() {
   }
 
   function init() {
+    var tileWidth = window.innerHeight / tileColumnCount;
+    var tileHeight = window.innerHeight / tileRowCount;
     for (c = 0; c < this.columns; c++) {
       this.tiles[c] = [];
       for (r = 0; r < this.rows; r++) {
-        this.tiles[c][r] = new Tile(c, r);
+        var tile = new Tile({c: c, r: r}, tileWidth, tileHeight);
+        console.log(tile);
+        this.tiles[c][r] = tile;
       }
     }
   }
