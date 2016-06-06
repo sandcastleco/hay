@@ -8,10 +8,3 @@ function getDevicePixelRatio() {
             ctx.backingStorePixelRatio || 1;
   return dpr / bsr;
 }
-
-function searchGrid(grid, callback) {
-  for (var hexIndex in grid) {
-    var currentHex = grid[hexIndex];
-    callback(currentHex, grid);
-  }
-}
