@@ -4,22 +4,19 @@ Properties:
 Description:
 */
 
-function Tile(x, y, width, height, fill) {
-  this.column = x;
-  this.row = y;
-  this.coordinates = [this.column, this.row];
-  this.x = x * tileWidth;
-  this.y = y * tileHeight;
+function Tile(coordinates, width, height, fill) {
+  this.coordinates = coordinates;
+  this.position = new Point(coordinates.c * width, coordinates.r * height);
+  this.width = width;
+  this.height = height;
   this.fill = fill || "#E7E7E7";
-  this.width = width || tileWidth;
-  this.height = height || tileHeight;
   this.occupied = false;
   this.valid = false;
 }
 Tile.prototype = (function() {
   function draw() {
     ctx.beginPath();
-    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.rect(this.position.x, this.position.y, this.width, this.height);
     if (this.valid) {
       ctx.fillStyle = "blue";
       ctx.strokeStyle = "white";
@@ -36,9 +33,6 @@ Tile.prototype = (function() {
   }
 })();
 
-// Tile.prototype.draw = function() {
-//
-// }
 // Tile.prototype.isPointInside = function(coordinates) {
 //   return (coordinates.x >= this.x && coordinates.x <= this.x + this.width && coordinates.y >= this.y && coordinates.y <= this.y + this.height);
 // }

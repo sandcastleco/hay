@@ -6,8 +6,7 @@ Description:
 
 function Piece(tile, fill, stroke) {
   this.tile = tile;
-  this.x = tile.x + tile.width / 2;
-  this.y = tile.y + tile.width / 2;
+  this.position = new Point(tile.position.x + tile.width / 2, tile.position.y + tile.width / 2);
   this.width = tile.width / 3;
   this.fill = fill || "#000";
   this.stroke = stroke || "#7E7E7E";
@@ -16,7 +15,7 @@ Piece.prototype = (function() {
   function draw() {
     this.tile.occupied = true;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.width, 0, Math.PI*2);
+    ctx.arc(this.position.x, this.position.y, this.width, 0, Math.PI*2);
     if (this.selected) {
       ctx.fillStyle = "blue";
     } else {
