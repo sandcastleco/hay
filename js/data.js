@@ -25,14 +25,14 @@ var pieceDescriptions = {
   }
 };
 var board = [
-  ["cow", "chi", "hay", "hay", "hay", "hay", "hay", "hay", "chi", "cow"],
-  ["pig", "cow", "chi", "pig", "hor", "far", "pig", "chi", "cow", "pig"],
+  [null, "pig", "chi", "cow", "hay", "hay", "cow", "chi", "pig", null],
+  [null, null, null, null, "far", "hor", null, null, null, null],
   [],
   [],
-  [null, null, null, "hay", "hay", "hay", "hay", null, null, null],
-  [null, null, null, "hay", "hay", "hay", "hay", null, null, null],
+  ["hay", null, null, "hay", "hay", "hay", "hay", null, null, "hay"],
+  ["hay", null, null, "hay", "hay", "hay", "hay", null, null, "hay"],
   [],
   [],
-  ["pig", "cow", "chi", "pig", "hor", "far", "pig", "chi", "cow", "pig"],
-  ["cow", "chi", "hay", "hay", "hay", "hay", "hay", "hay", "chi", "cow"]
+  [null, null, null, null, "hor", "far", null, null, null, null],
+  [null, "pig", "chi", "cow", "hay", "hay", "cow", "chi", "pig", null]
 ]
