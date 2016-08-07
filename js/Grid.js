@@ -32,7 +32,6 @@ Grid.prototype = (function() {
       this.tiles[c] = [];
       for (r = 0; r < this.rows; r++) {
         var tile = new Tile({c: c, r: r}, tileWidth, tileHeight);
-        console.log(tile);
         this.tiles[c][r] = tile;
       }
     }

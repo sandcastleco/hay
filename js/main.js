@@ -16,6 +16,18 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
+function createPieces() {
+  for (r = 0; r < board.length; r++) {
+    for (c = 0; c < tileColumnCount; c++) {
+      var currentPiece = board[r][c];
+      if (currentPiece != undefined) {
+        var piece = pieceDescriptions[currentPiece];
+        pieces.push(new Piece(grid.tiles[c][r], piece.color));
+      }
+    }
+  }
+}
+
 window.onload = function() {
   gameCanvas = new Canvas(window.innerHeight, window.innerHeight);
   ctx = gameCanvas.element.ctx;
@@ -23,19 +35,20 @@ window.onload = function() {
 
   grid = new Grid(tileRowCount, tileColumnCount);
 
-  // Create piece objects
-  for (r = 0; r < board.length; r++) {
-    for (c = 0; c < tileColumnCount; c++) {
-      var currentPiece = board[r][c];
-      console.log(currentPiece);
-      if (currentPiece != undefined) {
-        var piece = pieceDescriptions[currentPiece];
-        pieces.push(new Piece(grid.tiles[c][r], piece.color));
+  createPieces();
+
+  gameCanvas.element.addEventListener("click", function(e) {
+    pieces.forEach(function(element) {
+      var coordinates = new Point(e.x, e.y);
+      if (element.isPointInside(coordinates)) {
+        console.log(element);
       }
-    }
-  }
+    })
+  });
 
   draw();
+
+  pieces[0].move(grid.tiles[0][0]);
 
 }
 

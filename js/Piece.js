@@ -12,6 +12,7 @@ function Piece(tile, fill, stroke) {
   this.stroke = stroke || "#7E7E7E";
 }
 Piece.prototype = (function() {
+
   function draw() {
     this.tile.occupied = true;
     ctx.beginPath();
@@ -27,8 +28,24 @@ Piece.prototype = (function() {
     ctx.closePath();
   }
 
+  function isPointInside(coordinates) {
+    var position = this.tile.position;
+    return (coordinates.x >= position.x && coordinates.x <= position.x + this.tile.width && coordinates.y >= position.y && coordinates.y <= position.y + this.tile.height);
+  }
+
+  function setPosition(tile) {
+    return new Point(tile.position.x + tile.width / 2, tile.position.y + tile.width / 2)
+  }
+
+  function move(tile) {
+    this.tile = tile;
+    this.position = setPosition(tile);
+  }
+
   return {
-    draw: draw
+    draw: draw,
+    move: move,
+    isPointInside: isPointInside
   }
 })();
 
