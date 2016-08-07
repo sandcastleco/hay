@@ -1,5 +1,6 @@
 var gameCanvas;
 var ctx;
+var game;
 var grid;
 var tileColumnCount = tileRowCount = 10;
 var pieces = [];
@@ -33,6 +34,7 @@ window.onload = function() {
   ctx = gameCanvas.element.ctx;
   gameCanvas.append();
 
+  game = new Game();
   grid = new Grid(tileRowCount, tileColumnCount);
 
   createPieces();
@@ -42,6 +44,7 @@ window.onload = function() {
       var coordinates = new Point(e.x, e.y);
       if (element.isPointInside(coordinates)) {
         console.log(element);
+        game.selectedPiece = element;
       }
     })
   });
