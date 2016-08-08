@@ -5,6 +5,7 @@ Description:
 */
 
 function Game() {
+  this.selectedPiece = null;
 }
 Game.prototype = (function() {
 

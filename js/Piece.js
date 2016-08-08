@@ -10,6 +10,7 @@ function Piece(tile, fill, stroke) {
   this.width = tile.width / 3;
   this.fill = fill || "#000";
   this.stroke = stroke || "#7E7E7E";
+  this.selected = false;
 }
 Piece.prototype = (function() {
 
@@ -29,7 +30,7 @@ Piece.prototype = (function() {
   }
 
   function isPointInside(coordinates) {
-    var position = this.tile.position;
+     var position = this.tile.position;
     return (coordinates.x >= position.x && coordinates.x <= position.x + this.tile.width && coordinates.y >= position.y && coordinates.y <= position.y + this.tile.height);
   }
 
