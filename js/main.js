@@ -40,11 +40,13 @@ window.onload = function() {
   createPieces();
 
   gameCanvas.element.addEventListener("click", function(e) {
+    var offset = gameCanvas.element.offsetLeft;
+    var coordinates = new Point(e.x - offset, e.y);
+    console.log(coordinates);
     pieces.forEach(function(element) {
       element.selected = false;
-      var coordinates = new Point(e.x, e.y);
       if (element.isPointInside(coordinates)) {
-        console.log(game);
+        console.log(element.position);
         game.selectPiece(element);
       }
     })
@@ -52,7 +54,7 @@ window.onload = function() {
 
   draw();
 
-  pieces[0].move(grid.tiles[0][0]);
+  // pieces[0].move(grid.tiles[0][0]);
 
 }
 
