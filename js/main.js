@@ -35,7 +35,6 @@ window.onload = function() {
   gameCanvas.append();
 
   game = new Game();
-  console.log(game);
   grid = new Grid(tileRowCount, tileColumnCount);
 
   createPieces();
@@ -45,10 +44,8 @@ window.onload = function() {
       element.selected = false;
       var coordinates = new Point(e.x, e.y);
       if (element.isPointInside(coordinates)) {
-        console.log(element);
-        element.selected = true;
-        game.selectedPiece = element;
         console.log(game);
+        game.selectPiece(element);
       }
     })
   });
