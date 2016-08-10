@@ -12,12 +12,13 @@ function Tile(coordinates, width, height, fill) {
   this.fill = fill || "#E7E7E7";
   this.occupied = false;
   this.valid = false;
+  this.highlight = false;
 }
 Tile.prototype = (function() {
   function draw() {
     ctx.beginPath();
     ctx.rect(this.position.x, this.position.y, this.width, this.height);
-    if (this.valid) {
+    if (this.highlight) {
       ctx.fillStyle = "blue";
       ctx.strokeStyle = "white";
       ctx.stroke();

@@ -9,7 +9,9 @@ function Game() {
 }
 Game.prototype = (function() {
   function selectPiece(piece) {
-    piece.selected = true;
+    if (piece) {
+      piece.selected = true;
+    }
     this.selectedPiece = piece;
   }
 
@@ -19,8 +21,20 @@ Game.prototype = (function() {
     });
   }
 
+  function clearHighlight() {
+    searchTiles(function(tile) {
+      tile.highlight = false;
+    });
+  }
+
+  function highlightTile(tile) {
+    tile.highlight = true;
+  }
+
   return {
     selectPiece: selectPiece,
-    clearSelection: clearSelection
+    highlightTile: highlightTile,
+    clearSelection: clearSelection,
+    clearHighlight: clearHighlight
   }
 })();

@@ -86,6 +86,8 @@ function clickHandler(e) {
   var tile = findTileByCoordinates(coordinates);
   if (game.selectedPiece && !tile.occupied) {
     game.selectedPiece.move(tile);
+    game.selectPiece(null);
+    console.log(game);
   }
   if (piece) {
     game.selectPiece(piece);
@@ -93,11 +95,20 @@ function clickHandler(e) {
 }
 
 function moveHandler(e) {
-  canvasElement.style.cursor = "default";
+  game.clearHighlight();
+
   var coordinates = findClickCoordinates(e);
-  var piece = findPieceByCoordinates(coordinates);
-  if (piece) {
+
+  if (game.selectedPiece) {
     canvasElement.style.cursor = "pointer";
+    var tile = findTileByCoordinates(coordinates);
+    game.highlightTile(tile);
+  } else {
+    canvasElement.style.cursor = "default";
+    var piece = findPieceByCoordinates(coordinates);
+    if (piece) {
+      canvasElement.style.cursor = "pointer";
+    }
   }
 }
 
