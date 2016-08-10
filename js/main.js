@@ -32,9 +32,9 @@ function createPieces() {
       if (currentPiece != undefined) {
         var piece = pieceDescriptions[currentPiece];
         var player;
-        if (r <= 1) {
+        if (r <= 1 && currentPiece != "hay") {
           player = 1;
-        } else if (r >= 8) {
+        } else if (r >= 8 && currentPiece != "hay") {
           player = 2;
         } else {
           player = null;
