@@ -9,6 +9,29 @@
   <body>
 
     <div id="turn"></div>
+    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyAchJ99I1qej6kESRe7cxOjo3aXXdyEOrI",
+        authDomain: "haygame-c4aa6.firebaseapp.com",
+        databaseURL: "https://haygame-c4aa6.firebaseio.com",
+        storageBucket: "haygame-c4aa6.appspot.com",
+      };
+      firebase.initializeApp(config);
+      var database = firebase.database();
+      function writeTurnData(turn) {
+        console.log("writing turn: " + turn);
+        database.ref('/turn').set(turn);
+      }
+      function writePieces(pieces) {
+        console.log(pieces);
+        console.log("writing pieces: " + pieces);
+        database.ref('/pieces').set(pieces);
+      }
+      var turnRef = database.ref('/turn');
+      var piecesRef = database.ref('/pieces');
+    </script>
     <script src="js/utilities.js"></script>
     <script src="js/data.js"></script>
     <script src="js/Canvas.js"></script>

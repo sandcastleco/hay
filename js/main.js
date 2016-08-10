@@ -37,12 +37,13 @@ function createPieces() {
         } else if (r >= 8 && currentPiece != "hay") {
           player = 2;
         } else {
-          player = null;
+          player = "none";
         }
         pieces.push(new Piece(grid.tiles[c][r], piece.color, player));
       }
     }
   }
+  writePieces(pieces);
 }
 
 function findClickCoordinates(e) {
@@ -126,13 +127,20 @@ window.onload = function() {
   game = new Game();
   grid = new Grid(tileRowCount, tileColumnCount);
 
-  createPieces();
+  // createPieces();
+
+  piecesRef.on('value', function(snapshot) {
+    pieces = snapshot.val();
+    pieces.forEach(function(piece, index) {
+      var newPiece = new Piece(grid.tiles[piece.tile.coordinates.c][piece.tile.coordinates.r], piece.fill, piece.player || "none");
+      pieces[index] = newPiece;
+    });
+  });
 
   canvasElement.addEventListener("mousemove", moveHandler);
   canvasElement.addEventListener("click", clickHandler);
 
   draw();
-
 }
 
 // /*

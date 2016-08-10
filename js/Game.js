@@ -39,12 +39,16 @@ Game.prototype = (function() {
     } else {
       this.turn = 1;
     }
+    writeTurnData(this.turn);
     writeTurn.call(this);
   }
 
   function writeTurn() {
-    var turnIndicator = document.getElementById("turn");
-    turnIndicator.innerHTML = "Player " + this.turn;
+    turnRef.on('value', function(snapshot) {
+      game.turn = snapshot.val();
+      var turnIndicator = document.getElementById("turn");
+      turnIndicator.innerHTML = "Player " + snapshot.val();
+    });
   }
 
   function init() {
