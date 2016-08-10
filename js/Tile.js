@@ -18,7 +18,7 @@ Tile.prototype = (function() {
   function draw() {
     ctx.beginPath();
     ctx.rect(this.position.x, this.position.y, this.width, this.height);
-    if (this.highlight) {
+    if (this.highlight && !this.occupied) {
       ctx.fillStyle = "blue";
       ctx.strokeStyle = "white";
       ctx.stroke();

@@ -31,7 +31,15 @@ function createPieces() {
       var currentPiece = board[r][c];
       if (currentPiece != undefined) {
         var piece = pieceDescriptions[currentPiece];
-        pieces.push(new Piece(grid.tiles[c][r], piece.color));
+        var player;
+        if (r <= 1) {
+          player = 1;
+        } else if (r >= 8) {
+          player = 2;
+        } else {
+          player = null;
+        }
+        pieces.push(new Piece(grid.tiles[c][r], piece.color, player));
       }
     }
   }
@@ -87,9 +95,9 @@ function clickHandler(e) {
   if (game.selectedPiece && !tile.occupied) {
     game.selectedPiece.move(tile);
     game.selectPiece(null);
-    console.log(game);
+    game.updateTurn();
   }
-  if (piece) {
+  if (piece && piece.player == game.turn) {
     game.selectPiece(piece);
   }
 }
@@ -106,7 +114,7 @@ function moveHandler(e) {
   } else {
     canvasElement.style.cursor = "default";
     var piece = findPieceByCoordinates(coordinates);
-    if (piece) {
+    if (piece && piece.player == game.turn) {
       canvasElement.style.cursor = "pointer";
     }
   }

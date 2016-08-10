@@ -3,8 +3,16 @@
   margin: 0;
   box-sizing: border-box;
 }
+body {
+  font-family: sans-serif;
+}
 canvas {
   background: #EEE;
   display: block;
   margin: 0 auto;
+}
+#turn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
 }

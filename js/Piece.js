@@ -4,13 +4,14 @@ Properties:
 Description:
 */
 
-function Piece(tile, fill, stroke) {
+function Piece(tile, fill, player, stroke) {
   this.tile = tile;
   this.position = new Point(tile.position.x + tile.width / 2, tile.position.y + tile.width / 2);
   this.width = tile.width / 3;
   this.fill = fill || "#000";
   this.stroke = stroke || "#7E7E7E";
   this.selected = false;
+  this.player = player;
 }
 Piece.prototype = (function() {
 
@@ -39,6 +40,7 @@ Piece.prototype = (function() {
   }
 
   function move(tile) {
+    this.tile.occupied = false;
     this.tile = tile;
     this.position = setPosition(tile);
   }
