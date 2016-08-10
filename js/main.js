@@ -1,4 +1,5 @@
 var gameCanvas;
+var canvasElement;
 var ctx;
 var game;
 var grid;
@@ -17,6 +18,13 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
+function createCanvas() {
+  gameCanvas = new Canvas(window.innerHeight, window.innerHeight);
+  canvasElement = gameCanvas.element;
+  ctx = canvasElement.ctx;
+  gameCanvas.append();
+}
+
 function createPieces() {
   for (r = 0; r < board.length; r++) {
     for (c = 0; c < tileColumnCount; c++) {
@@ -29,32 +37,82 @@ function createPieces() {
   }
 }
 
+function findClickCoordinates(e) {
+  var offset = canvasElement.offsetLeft;
+  var coordinates = new Point(e.x - offset, e.y);
+  return coordinates
+}
+
+function searchPieces(callback) {
+  pieces.forEach(callback);
+}
+
+function searchTiles(callback) {
+  for (var c = 0; c < grid.columns; c++) {
+    for (var r = 0; r < grid.rows; r++) {
+      callback(grid.tiles[c][r]);
+    }
+  }
+}
+
+function findPieceByCoordinates(coordinates) {
+  var foundPiece;
+  searchPieces(function(piece) {
+    if (piece.isPointInside(coordinates)) {
+      foundPiece = piece;
+      return;
+    }
+  });
+  return foundPiece;
+}
+
+function findTileByCoordinates(coordinates) {
+  var foundTile;
+  searchTiles(function(tile) {
+    if (tile.isPointInside(coordinates)) {
+      foundTile = tile;
+      return;
+    }
+  });
+  return foundTile;
+}
+
+function clickHandler(e) {
+  var coordinates = findClickCoordinates(e);
+
+  game.clearSelection();
+
+  var piece = findPieceByCoordinates(coordinates);
+  var tile = findTileByCoordinates(coordinates);
+  if (game.selectedPiece && !tile.occupied) {
+    game.selectedPiece.move(tile);
+  }
+  if (piece) {
+    game.selectPiece(piece);
+  }
+}
+
+function moveHandler(e) {
+  canvasElement.style.cursor = "default";
+  var coordinates = findClickCoordinates(e);
+  var piece = findPieceByCoordinates(coordinates);
+  if (piece) {
+    canvasElement.style.cursor = "pointer";
+  }
+}
+
 window.onload = function() {
-  gameCanvas = new Canvas(window.innerHeight, window.innerHeight);
-  ctx = gameCanvas.element.ctx;
-  gameCanvas.append();
+  createCanvas();
 
   game = new Game();
   grid = new Grid(tileRowCount, tileColumnCount);
 
   createPieces();
 
-  gameCanvas.element.addEventListener("click", function(e) {
-    var offset = gameCanvas.element.offsetLeft;
-    var coordinates = new Point(e.x - offset, e.y);
-    console.log(coordinates);
-    pieces.forEach(function(element) {
-      element.selected = false;
-      if (element.isPointInside(coordinates)) {
-        console.log(element.position);
-        game.selectPiece(element);
-      }
-    })
-  });
+  canvasElement.addEventListener("mousemove", moveHandler);
+  canvasElement.addEventListener("click", clickHandler);
 
   draw();
-
-  // pieces[0].move(grid.tiles[0][0]);
 
 }
 

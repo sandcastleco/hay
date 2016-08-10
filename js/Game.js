@@ -13,7 +13,14 @@ Game.prototype = (function() {
     this.selectedPiece = piece;
   }
 
+  function clearSelection() {
+    searchPieces(function(piece) {
+      piece.selected = false;
+    });
+  }
+
   return {
-    selectPiece: selectPiece
+    selectPiece: selectPiece,
+    clearSelection: clearSelection
   }
 })();

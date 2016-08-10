@@ -28,8 +28,14 @@ Tile.prototype = (function() {
     ctx.closePath();
   }
 
+  function isPointInside(coordinates) {
+    var position = this.position;
+    return (coordinates.x >= position.x && coordinates.x <= position.x + this.width && coordinates.y >= position.y && coordinates.y <= position.y + this.height);
+  }
+
   return {
-    draw: draw
+    draw: draw,
+    isPointInside: isPointInside
   }
 })();
 
