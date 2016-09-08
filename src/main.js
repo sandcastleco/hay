@@ -94,6 +94,10 @@ window.onload = function() {
   resetButton.addEventListener("click", function() {
     // database.ref('/pieces').remove();
     // writeTurnData(1);
+    searchTiles(function(tile) {
+      tile.occupied = false;
+    });
+    game.state.setTurn(1);
     game.reset();
   });
 

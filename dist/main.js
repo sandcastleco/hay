@@ -131,8 +131,8 @@ GameState.prototype = (function() {
   }
 
   function setTurn(turn) {
-    console.log(turn);
     this.turn = turn;
+    writeTurn.call(this);
   }
 
   function updateTurn() {
@@ -166,6 +166,7 @@ GameState.prototype = (function() {
     clearSelection: clearSelection,
     clearHighlight: clearHighlight,
     updateTurn: updateTurn,
+    setTurn: setTurn,
     init: init
   }
 })();
@@ -589,6 +590,10 @@ window.onload = function() {
   resetButton.addEventListener("click", function() {
     // database.ref('/pieces').remove();
     // writeTurnData(1);
+    searchTiles(function(tile) {
+      tile.occupied = false;
+    });
+    game.state.setTurn(1);
     game.reset();
   });
 

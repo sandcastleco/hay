@@ -34,8 +34,8 @@ GameState.prototype = (function() {
   }
 
   function setTurn(turn) {
-    console.log(turn);
     this.turn = turn;
+    writeTurn.call(this);
   }
 
   function updateTurn() {
@@ -69,6 +69,7 @@ GameState.prototype = (function() {
     clearSelection: clearSelection,
     clearHighlight: clearHighlight,
     updateTurn: updateTurn,
+    setTurn: setTurn,
     init: init
   }
 })();
