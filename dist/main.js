@@ -24,13 +24,13 @@ Canvas.prototype = (function() {
     return canvas;
   }
 
-  function append() {
+  function draw() {
     document.body.appendChild(this.element);
   }
 
   return {
     createCanvas: createCanvas,
-    append: append
+    draw: draw
   }
 })();
 
@@ -41,11 +41,72 @@ Description:
 */
 
 function Game() {
+  this.state = new GameState();
+  this.gameCanvas = new Canvas(window.innerHeight, window.innerHeight);
+  this.ctx = this.gameCanvas.element.ctx;
+  this.grid = new Grid(tileColumnCount, tileRowCount);
+  this.pieces = [];
+  this.init();
+}
+Game.prototype = (function() {
+  function _createCanvas() {
+    this.gameCanvas.draw();
+  }
+
+  function _createPieces() {
+    this.pieces = [];
+    for (r = 0; r < board.length; r++) {
+      for (c = 0; c < tileColumnCount; c++) {
+        var currentPiece = board[r][c];
+        if (currentPiece != undefined) {
+          var piece = pieceDescriptions[currentPiece];
+          var player;
+          if (r <= 1 && currentPiece != "hay") {
+            player = 1;
+          } else if (r >= 8 && currentPiece != "hay") {
+            player = 2;
+          } else {
+            player = "none";
+          }
+          this.pieces.push(new Piece(this.grid.tiles[c][r], piece.color, player));
+        }
+      }
+    }
+    // writePieces(this.pieces);
+  }
+
+  function draw() {
+    game.ctx.clearRect(0, 0, game.gameCanvas.width, game.gameCanvas.height);
+    game.grid.draw();
+    for (var i = 0; i < game.pieces.length; i++) {
+      game.pieces[i].draw();
+    }
+  }
+
+  function init() {
+    _createCanvas.call(this);
+    _createPieces.call(this);
+  }
+
+  return {
+    init: init,
+    draw: draw,
+    reset: _createPieces
+  }
+})();
+
+/*
+Class: GameState
+Properties:
+Description:
+*/
+
+function GameState() {
   this.selectedPiece = null;
   this.turn = 1;
   this.init();
 }
-Game.prototype = (function() {
+GameState.prototype = (function() {
   function selectPiece(piece) {
     if (piece) {
       piece.selected = true;
@@ -69,22 +130,30 @@ Game.prototype = (function() {
     tile.highlight = true;
   }
 
+  function setTurn(turn) {
+    console.log(turn);
+    this.turn = turn;
+  }
+
   function updateTurn() {
     if (this.turn == 1) {
       this.turn = 2;
     } else {
       this.turn = 1;
     }
-    writeTurnData(this.turn);
+    // writeTurnData(this.turn);
     writeTurn.call(this);
   }
 
   function writeTurn() {
-    turnRef.on('value', function(snapshot) {
-      game.turn = snapshot.val();
-      var turnIndicator = document.getElementById("turn");
-      turnIndicator.innerHTML = "Player " + snapshot.val();
-    });
+    var turnIndicator = document.getElementById("turn");
+    turnIndicator.innerHTML = "Player " + this.turn;
+    // turnRef.on('value', function(snapshot) {
+    //   game.turn = snapshot.val();
+    //   var turnIndicator = document.getElementById("turn");
+    //   turnIndicator.innerHTML = "Player " + snapshot.val();
+    //   setTurn(snapshot.val());
+    // });
   }
 
   function init() {
@@ -195,7 +264,7 @@ Piece.prototype = (function() {
     this.tile.occupied = false;
     this.tile = tile;
     this.position = setPosition(tile);
-    writePieces(pieces);
+    // writePieces(game.pieces);
   }
 
   return {
@@ -424,54 +493,18 @@ var board = [
   [null, "pig", "chi", "cow", "hay", "hay", "cow", "chi", "pig", null]
 ]
 
-var gameCanvas;
 var canvasElement;
 var ctx;
-var game;
-var grid;
 var tileColumnCount = tileRowCount = 10;
-var pieces = [];
+var resetButton;
 
 function draw() {
-  ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-  grid.draw();
-
-  for (var i = 0; i < pieces.length; i++) {
-    pieces[i].draw();
-  }
-
+  // maybe a better way to do this?
+  game.draw();
   requestAnimationFrame(draw);
 }
 
-function createCanvas() {
-  gameCanvas = new Canvas(window.innerHeight, window.innerHeight);
-  canvasElement = gameCanvas.element;
-  ctx = canvasElement.ctx;
-  gameCanvas.append();
-}
-
-function createPieces() {
-  for (r = 0; r < board.length; r++) {
-    for (c = 0; c < tileColumnCount; c++) {
-      var currentPiece = board[r][c];
-      if (currentPiece != undefined) {
-        var piece = pieceDescriptions[currentPiece];
-        var player;
-        if (r <= 1 && currentPiece != "hay") {
-          player = 1;
-        } else if (r >= 8 && currentPiece != "hay") {
-          player = 2;
-        } else {
-          player = "none";
-        }
-        pieces.push(new Piece(grid.tiles[c][r], piece.color, player));
-      }
-    }
-  }
-  writePieces(pieces);
-}
-
+// Move these into a canvas library for finding elements? Or into the canvas module?
 function findClickCoordinates(e) {
   var offset = canvasElement.offsetLeft;
   var coordinates = new Point(e.x - offset, e.y);
@@ -479,13 +512,13 @@ function findClickCoordinates(e) {
 }
 
 function searchPieces(callback) {
-  pieces.forEach(callback);
+  game.pieces.forEach(callback);
 }
 
 function searchTiles(callback) {
-  for (var c = 0; c < grid.columns; c++) {
-    for (var r = 0; r < grid.rows; r++) {
-      callback(grid.tiles[c][r]);
+  for (var c = 0; c < game.grid.columns; c++) {
+    for (var r = 0; r < game.grid.rows; r++) {
+      callback(game.grid.tiles[c][r]);
     }
   }
 }
@@ -515,139 +548,69 @@ function findTileByCoordinates(coordinates) {
 function clickHandler(e) {
   var coordinates = findClickCoordinates(e);
 
-  game.clearSelection();
+  game.state.clearSelection();
 
   var piece = findPieceByCoordinates(coordinates);
   var tile = findTileByCoordinates(coordinates);
-  if (game.selectedPiece && !tile.occupied) {
-    game.selectedPiece.move(tile);
-    game.selectPiece(null);
-    game.updateTurn();
+  if (game.state.selectedPiece && !tile.occupied) {
+    game.state.selectedPiece.move(tile);
+    game.state.selectPiece(null);
+    game.state.updateTurn();
   }
-  if (piece && piece.player == game.turn) {
-    game.selectPiece(piece);
+  if (piece && piece.player == game.state.turn) {
+    game.state.selectPiece(piece);
   }
 }
 
 function moveHandler(e) {
-  game.clearHighlight();
+  game.state.clearHighlight();
 
   var coordinates = findClickCoordinates(e);
 
-  if (game.selectedPiece) {
+  if (game.state.selectedPiece) {
     canvasElement.style.cursor = "pointer";
     var tile = findTileByCoordinates(coordinates);
-    game.highlightTile(tile);
+    game.state.highlightTile(tile);
   } else {
     canvasElement.style.cursor = "default";
     var piece = findPieceByCoordinates(coordinates);
-    if (piece && piece.player == game.turn) {
+    if (piece && piece.player == game.state.turn) {
       canvasElement.style.cursor = "pointer";
     }
   }
 }
 
 window.onload = function() {
-  createCanvas();
 
   game = new Game();
-  grid = new Grid(tileRowCount, tileColumnCount);
-
-  // createPieces();
+  canvasElement = game.gameCanvas.element;
+  ctx = game.ctx;
+  resetButton = document.getElementById('reset');
+  resetButton.addEventListener("click", function() {
+    // database.ref('/pieces').remove();
+    // writeTurnData(1);
+    game.reset();
+  });
 
   // TODO: Make the pieces track their position by row and column rather than tile data.
   // Is the tile updating as occupied or not accurately?
+  // Move firebase related code into a module?
 
-  piecesRef.on('value', function(snapshot) {
-    pieces = snapshot.val();
-    pieces.forEach(function(piece, index) {
-      var newPiece = new Piece(grid.tiles[piece.tile.coordinates.c][piece.tile.coordinates.r], piece.fill, piece.player || "none");
-      pieces[index] = newPiece;
-    });
-  });
+  // piecesRef.on('value', function(snapshot) {
+  //   game.pieces = snapshot.val();
+  //   if (game.pieces) {
+  //     game.pieces.forEach(function(piece, index) {
+  //       var newPiece = new Piece(game.grid.tiles[piece.tile.coordinates.c][piece.tile.coordinates.r], piece.fill, piece.player || "none");
+  //       game.pieces[index] = newPiece;
+  //     });
+  //   }
+  // });
 
   canvasElement.addEventListener("mousemove", moveHandler);
   canvasElement.addEventListener("click", clickHandler);
 
   draw();
 }
-
-// /*
-//  * Accept
-//  */
-//
-// canvas.addEventListener("click", clickHandler, false);
-//
-// /*
-//  * Interpret & Calculate
-//  */
-//
-// function findClickCoordinates(event) {
-//   var mouseX = parseInt(event.clientX - canvas.offsetLeft);
-//   var mouseY = parseInt(event.clientY - canvas.offsetTop);
-//   return {x: mouseX, y: mouseY};
-// }
-//
-// function findClickedTile(coordinates) {
-//   for (var c = 0; c < tileColumnCount; c++) {
-//     for (var r = 0; r < tileColumnCount; r++) {
-//       var tile = tiles[c][r];
-//       if (tile.isPointInside(coordinates)) {
-//         return tile;
-//       }
-//     }
-//   }
-// }
-//
-// function findClickedPiece(coordinates) {
-//   for(var i = 0; i < pieces.length; i++) {
-//     var piece = pieces[i];
-//     if (piece.isPointInside(coordinates)) {
-//       return piece;
-//     }
-//   }
-// }
-//
-// function selectPiece(piece) {
-//   selectedPiece = piece;
-//   selectedPiece.selected = true;
-//   selectedPiece.findValidMoves();
-// }
-//
-// function clearSelection() {
-//   selectedPiece.selected = false;
-//   clearValidMoves(selectedPiece);
-//   selectedPiece = null;
-// }
-//
-// function clearValidMoves(piece) {
-//   for (var i = 0; i < piece.validMoves.length; i++) {
-//     piece.validMoves[i].valid = false;
-//   }
-// }
-//
-// function clickHandler(e) {
-//   var mouseCoordinates = findClickCoordinates(e);
-//
-//   var tile = findClickedTile(mouseCoordinates);
-//   var piece = findClickedPiece(mouseCoordinates);
-//
-//   if (selectedPiece && tile.valid) {
-//     selectedPiece.move(tile);
-//   }
-//
-//   if (piece) {
-//     if (selectedPiece) {
-//       clearSelection();
-//     } else {
-//       selectPiece(piece);
-//     }
-//   }
-//
-//   draw();
-// }
-//
-// draw();
 
 function getDevicePixelRatio() {
   var ctx = document.createElement("canvas").getContext("2d");

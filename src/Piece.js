@@ -43,7 +43,7 @@ Piece.prototype = (function() {
     this.tile.occupied = false;
     this.tile = tile;
     this.position = setPosition(tile);
-    writePieces(pieces);
+    // writePieces(game.pieces);
   }
 
   return {

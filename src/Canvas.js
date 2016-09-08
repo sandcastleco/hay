@@ -24,12 +24,12 @@ Canvas.prototype = (function() {
     return canvas;
   }
 
-  function append() {
+  function draw() {
     document.body.appendChild(this.element);
   }
 
   return {
     createCanvas: createCanvas,
-    append: append
+    draw: draw
   }
 })();

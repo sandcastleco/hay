@@ -8,8 +8,12 @@
   </head>
   <body>
 
-    <div id="turn"></div>
-    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+    <div class="menu">
+      <div id="turn"></div>
+      <button id="reset">Reset board</button>
+    </div>
+
+    <!-- <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
     <script>
       // Initialize Firebase
       var config = {
@@ -25,13 +29,12 @@
         database.ref('/turn').set(turn);
       }
       function writePieces(pieces) {
-        console.log(pieces);
         console.log("writing pieces: " + pieces);
         database.ref('/pieces').set(pieces);
       }
       var turnRef = database.ref('/turn');
       var piecesRef = database.ref('/pieces');
-    </script>
+    </script> -->
     <script src="dist/main.js"></script>
   </body>
 </html>

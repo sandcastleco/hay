@@ -5,62 +5,56 @@ Description:
 */
 
 function Game() {
-  this.selectedPiece = null;
-  this.turn = 1;
+  this.state = new GameState();
+  this.gameCanvas = new Canvas(window.innerHeight, window.innerHeight);
+  this.ctx = this.gameCanvas.element.ctx;
+  this.grid = new Grid(tileColumnCount, tileRowCount);
+  this.pieces = [];
   this.init();
 }
 Game.prototype = (function() {
-  function selectPiece(piece) {
-    if (piece) {
-      piece.selected = true;
+  function _createCanvas() {
+    this.gameCanvas.draw();
+  }
+
+  function _createPieces() {
+    this.pieces = [];
+    for (r = 0; r < board.length; r++) {
+      for (c = 0; c < tileColumnCount; c++) {
+        var currentPiece = board[r][c];
+        if (currentPiece != undefined) {
+          var piece = pieceDescriptions[currentPiece];
+          var player;
+          if (r <= 1 && currentPiece != "hay") {
+            player = 1;
+          } else if (r >= 8 && currentPiece != "hay") {
+            player = 2;
+          } else {
+            player = "none";
+          }
+          this.pieces.push(new Piece(this.grid.tiles[c][r], piece.color, player));
+        }
+      }
     }
-    this.selectedPiece = piece;
+    // writePieces(this.pieces);
   }
 
-  function clearSelection() {
-    searchPieces(function(piece) {
-      piece.selected = false;
-    });
-  }
-
-  function clearHighlight() {
-    searchTiles(function(tile) {
-      tile.highlight = false;
-    });
-  }
-
-  function highlightTile(tile) {
-    tile.highlight = true;
-  }
-
-  function updateTurn() {
-    if (this.turn == 1) {
-      this.turn = 2;
-    } else {
-      this.turn = 1;
+  function draw() {
+    game.ctx.clearRect(0, 0, game.gameCanvas.width, game.gameCanvas.height);
+    game.grid.draw();
+    for (var i = 0; i < game.pieces.length; i++) {
+      game.pieces[i].draw();
     }
-    writeTurnData(this.turn);
-    writeTurn.call(this);
-  }
-
-  function writeTurn() {
-    turnRef.on('value', function(snapshot) {
-      game.turn = snapshot.val();
-      var turnIndicator = document.getElementById("turn");
-      turnIndicator.innerHTML = "Player " + snapshot.val();
-    });
   }
 
   function init() {
-    writeTurn.call(this);
+    _createCanvas.call(this);
+    _createPieces.call(this);
   }
 
   return {
-    selectPiece: selectPiece,
-    highlightTile: highlightTile,
-    clearSelection: clearSelection,
-    clearHighlight: clearHighlight,
-    updateTurn: updateTurn,
-    init: init
+    init: init,
+    draw: draw,
+    reset: _createPieces
   }
 })();
