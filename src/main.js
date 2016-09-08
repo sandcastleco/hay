@@ -129,6 +129,9 @@ window.onload = function() {
 
   // createPieces();
 
+  // TODO: Make the pieces track their position by row and column rather than tile data.
+  // Is the tile updating as occupied or not accurately?
+
   piecesRef.on('value', function(snapshot) {
     pieces = snapshot.val();
     pieces.forEach(function(piece, index) {

@@ -6,24 +6,28 @@ module.exports = function(grunt) {
         options: {}
       }
     },
+
     watch: {
-      html: {
-        files: ['index.html'],
-      },
       js: {
-        files: ['js/**/*.js']
+        files: ['src/**/*.js'],
+        tasks: ['concat']
+      }
+    },
+
+    concat: {
+      options: {
+        sourceMap: true
       },
-      css: {
-        files: ['css/**/*.css']
-      },
-      audio: {
-        files: ['audio/**/*.mp3']
+      dist: {
+        src: ['src/**/*.js'],
+        dest: 'dist/main.js'
       }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('default', ['connect', 'watch']);
+  grunt.registerTask('default', ['concat', 'connect', 'watch']);
 }
