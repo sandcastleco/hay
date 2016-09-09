@@ -24,6 +24,7 @@ Piece.prototype = (function() {
     } else {
       ctx.fillStyle = this.fill;
     }
+    ctx.lineWidth = 3;
     ctx.strokeStyle = this.stroke;
     ctx.fill();
     ctx.stroke();

@@ -32,7 +32,12 @@ Game.prototype = (function() {
           } else {
             player = "none";
           }
-          this.pieces.push(new Piece(this.grid.tiles[c][r], piece.color, player));
+          if (player == 1 || currentPiece == "hay") {
+            var piece = new Piece(this.grid.tiles[c][r], piece.color, player);
+          } else {
+            var piece = new Piece(this.grid.tiles[c][r], '#FFF', player, piece.color);
+          }
+          this.pieces.push(piece);
         }
       }
     }

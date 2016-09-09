@@ -68,7 +68,12 @@ Game.prototype = (function() {
           } else {
             player = "none";
           }
-          this.pieces.push(new Piece(this.grid.tiles[c][r], piece.color, player));
+          if (player == 1 || currentPiece == "hay") {
+            var piece = new Piece(this.grid.tiles[c][r], piece.color, player);
+          } else {
+            var piece = new Piece(this.grid.tiles[c][r], '#FFF', player, piece.color);
+          }
+          this.pieces.push(piece);
         }
       }
     }
@@ -246,6 +251,7 @@ Piece.prototype = (function() {
     } else {
       ctx.fillStyle = this.fill;
     }
+    ctx.lineWidth = 3;
     ctx.strokeStyle = this.stroke;
     ctx.fill();
     ctx.stroke();
@@ -474,7 +480,7 @@ var pieceDescriptions = {
   },
   chi: {
     name: "chicken",
-    color: "white"
+    color: "moccasin"
   },
   hay: {
     name: "hay",

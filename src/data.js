@@ -17,7 +17,7 @@ var pieceDescriptions = {
   },
   chi: {
     name: "chicken",
-    color: "white"
+    color: "moccasin"
   },
   hay: {
     name: "hay",
