@@ -151,8 +151,19 @@ GameState.prototype = (function() {
   }
 
   function writeTurn() {
+    var menu = document.getElementById("menu");
     var turnIndicator = document.getElementById("turn");
     turnIndicator.innerHTML = "Player " + this.turn;
+    if (this.turn == 2) {
+      console.log("turn 2");
+      menu.style.top = "initial";
+      menu.style.bottom = "20px";
+      turnIndicator.style.color = "red";
+    } else {
+      menu.style.top = "20px";
+      menu.style.bottom = "initial";
+      turnIndicator.style.color = "blue";
+    }
     // turnRef.on('value', function(snapshot) {
     //   game.turn = snapshot.val();
     //   var turnIndicator = document.getElementById("turn");

@@ -4,15 +4,20 @@
   box-sizing: border-box;
 }
 body {
-  font-family: sans-serif;
+  font-family: -apple-system, sans-serif;
 }
 canvas {
   background: #EEE;
   display: block;
   margin: 0 auto;
 }
-.menu {
+#menu {
   position: fixed;
   top: 20px;
   right: 20px;
+}
+#turn {
+  font-weight: bold;
+  color: blue;
+  margin-bottom: 15px;
 }
